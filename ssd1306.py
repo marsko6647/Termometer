@@ -2,9 +2,6 @@ from micropython import const
 import framebuf
 import time
 
-# -------------------------
-# SSD1306 COMMANDS
-# -------------------------
 SET_CONTRAST = const(0x81)
 SET_ENTIRE_ON = const(0xA4)
 SET_NORM_INV = const(0xA6)
@@ -24,10 +21,6 @@ SET_PRECHARGE = const(0xD9)
 SET_VCOM_DESEL = const(0xDB)
 SET_CHARGE_PUMP = const(0x8D)
 
-
-# -------------------------
-# BASE CLASS (NO IO HERE)
-# -------------------------
 class SSD1306(framebuf.FrameBuffer):
     def __init__(self, width, height, external_vcc=False):
         self.width = width
@@ -91,30 +84,6 @@ class SSD1306(framebuf.FrameBuffer):
 
         self.write_data(self.buffer)
 
-
-# -------------------------
-# I2C DRIVER
-# -------------------------
-class SSD1306_I2C(SSD1306):
-    def __init__(self, width, height, i2c, addr=0x3C, external_vcc=False):
-        self.i2c = i2c
-        self.addr = addr
-        self.temp = bytearray(2)
-
-        super().__init__(width, height, external_vcc)
-
-    def write_cmd(self, cmd):
-        self.temp[0] = 0x80
-        self.temp[1] = cmd
-        self.i2c.writeto(self.addr, self.temp)
-
-    def write_data(self, buf):
-        self.i2c.writeto(self.addr, b'\x40' + buf)
-
-
-# -------------------------
-# SPI DRIVER
-# -------------------------
 class SSD1306_SPI(SSD1306):
     def __init__(self, width, height, spi, dc, res, cs,
                  external_vcc=False):
